@@ -1,6 +1,6 @@
 Simple-n-grams
 ==============
-
+<pre>
 ./term_frequency.py -h
 usage: term_frequency.py [-h] [-n NUMBER_OF_GRAMS] [-c CHAR_LIMIT] [-p]
                          [-k N_GRAMS] [-f FILTER]
@@ -24,15 +24,18 @@ optional arguments:
   -f FILTER, --filter FILTER
                         List of terms to filter "the,and,happy"
 
+</pre>
+
 Using the example in the data package, the first column is the term count, the second
 is the fraction of all term counts, ther third is the number of paragraphs (defined
 by \n) containing the term and the fourth, the fraction fo paragraphs.
 
 
->term_frequency.py Simple-n-grams/data/LanceArmstrongWikipedia.txt 
+term_frequency.py Simple-n-grams/data/LanceArmstrongWikipedia.txt 
 
 ##1-Grams
 
+<pre>
 count,frac_gram,act_count,act_frac,n_gram
 13,0.045296,4,1.000000,armstrong,1grams
 6,0.020906,2,0.500000,doping,1grams
@@ -81,8 +84,10 @@ count,frac_gram,act_count,act_frac,n_gram
 2,0.006969,2,0.500000,agency,1grams
 ...
 
+</pre>
 ##2-Grams
 
+<pre>
 5,0.017668,4,1.000000,tour france,2grams
 3,0.010601,3,0.750000,competitive cycling,2grams
 2,0.007067,2,0.500000,anti doping,2grams
@@ -95,3 +100,4 @@ count,frac_gram,act_count,act_frac,n_gram
 2,0.007067,2,0.500000,1999 2005,2grams
 1,0.003534,1,0.250000,third 2009,2grams
 ...
+</pre>
