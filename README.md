@@ -1,7 +1,7 @@
 Simple-n-grams
 ==============
 
-> ./term_frequency.py -h
+./term_frequency.py -h
 usage: term_frequency.py [-h] [-n NUMBER_OF_GRAMS] [-c CHAR_LIMIT] [-p]
                          [-k N_GRAMS] [-f FILTER]
                          [file_name]
@@ -30,6 +30,8 @@ by \n) containing the term and the fourth, the fraction fo paragraphs.
 
 
 >term_frequency.py Simple-n-grams/data/LanceArmstrongWikipedia.txt 
+
+##1-Grams
 
 count,frac_gram,act_count,act_frac,n_gram
 13,0.045296,4,1.000000,armstrong,1grams
@@ -77,6 +79,7 @@ count,frac_gram,act_count,act_frac,n_gram
 2,0.006969,2,0.500000,triathlon,1grams
 2,0.006969,1,0.250000,began,1grams
 2,0.006969,2,0.500000,agency,1grams
+...
 
 ##2-Grams
 
@@ -91,5 +94,4 @@ count,frac_gram,act_count,act_frac,n_gram
 2,0.007067,1,0.250000,armstrong began,2grams
 2,0.007067,2,0.500000,1999 2005,2grams
 1,0.003534,1,0.250000,third 2009,2grams
-
-
+...
