@@ -4,9 +4,6 @@ import sys
 import pickle
 import operator
 import re
-import unittest
-import argparse
-import fileinput
 
 from stop_words import StopWords
 
@@ -20,13 +17,13 @@ class SimpleNGrams:
             charCutoff = 2,
             charUpperCutoff = 25,
             cutoff = 0.00001,
-            spaceTokenizer=False,
+            space_tokenizer=False,
             n_grams = 2):
         self.char_cutoff = charCutoff
         self.char_upper_cutoff = charUpperCutoff
         # if cutoff < 1, compare frac else total count
         self.cutoff = cutoff
-        self.space_tokenizer = spaceTokenizer
+        self.space_tokenizer = space_tokenizer
         self.n_grams = int(n_grams)
 
         self.sl = StopWords()

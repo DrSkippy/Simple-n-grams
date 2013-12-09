@@ -24,11 +24,13 @@ if __name__ == "__main__":
             help="Prettier output format")
     grams_parser.add_argument("-k", "--n-grams", dest="n_grams", default=2,
             help="N-gram depth (default 2)")
+    grams_parser.add_argument("-t", "--space-tokenizer", dest="space_tokenizer", default=False, action="store_true",
+            help="Use alternate tokization on white-space only.")
     grams_parser.add_argument("-f", "--filter", dest="filter", default=None,
             help="List of terms to filter \"the,and,happy\"")
     opts = grams_parser.parse_args()
 
-    f = SimpleNGrams(charCutoff=int(opts.char_limit), n_grams=opts.n_grams)
+    f = SimpleNGrams(charCutoff=int(opts.char_limit), n_grams=opts.n_grams, space_tokenizer=opts.space_tokenizer)
     if opts.filter is not None:
         tmp = [x.lower().strip() for x in opts.filter.split(",")]
         f.sl.add_session_stop_list(tmp)
