@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='sngrams',
-    version='0.1.1',
+    version='0.1.3',
     author='Scott Hendrickson',
     author_email='scott@drskippy.net',
     packages=['simple_n_grams'],
