@@ -122,7 +122,7 @@ class SimpleNGrams:
 
     def get_repr(self, n=None):
         # if you want a header in the output
-        res = u','.join([ "count", "frac_gram", "act_count", "act_frac", "n_gram\n"])
+        res = u','.join([ "total count", "percent of total", "activties count", "percent of activities","tokens", "n_gram\n"])
         for x in self.get_tokens(n):
             res += ','.join(self.build_string_list(x) + ["%dgrams\n"%(x[-1].count(" ") + 1)])
         return res
