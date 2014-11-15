@@ -26,11 +26,20 @@ if __name__ == "__main__":
             help="N-gram depth (default 2)")
     grams_parser.add_argument("-t", "--space-tokenizer", dest="space_tokenizer", default=False, action="store_true",
             help="Use alternate tokization on white-space only.")
+    grams_parser.add_argument("-w", "--twitter-tokenizer", dest="twitter_tokenizer", default=False, action="store_true",
+            help="Use alternate Twitter tokization with hashtags and mentions intact.")
     grams_parser.add_argument("-f", "--filter", dest="filter", default=None,
             help="List of terms to filter \"the,and,happy\"")
     opts = grams_parser.parse_args()
 
-    f = SimpleNGrams(charCutoff=int(opts.char_limit), n_grams=opts.n_grams, space_tokenizer=opts.space_tokenizer)
+    if opts.space_tokenizer:
+        tokenizer = "space"
+    elif opts.twitter_tokenizer:
+        tokenizer = "twitter"
+    else:
+        tokenizer = "word"
+
+    f = SimpleNGrams(char_lower_cutoff=int(opts.char_limit), n_grams=opts.n_grams, tokenizer=tokenizer)
     if opts.filter is not None:
         tmp = [x.lower().strip() for x in opts.filter.split(",")]
         f.sl.add_session_stop_list(tmp)
@@ -41,7 +50,7 @@ if __name__ == "__main__":
     else:
         res = f.get_repr(int(opts.number_of_grams))
     if opts.pretty_print:
-        fmt = ["%5s", "%9s", "%5s", "%9s", "%24s", "%7s"] 
+        fmt = ["%5s", "%9s", "%5s", "%9s", "%34s", "%7s"] 
         for x in res.split('\n'):
             tmp_str = x.strip().split(",")
             sys.stdout.write(" ".join([j%i for i,j in zip(tmp_str,fmt)]) + "\n")

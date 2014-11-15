@@ -4,30 +4,98 @@ import sys
 import pickle
 import operator
 import re
+import codecs
 
 from stop_words import StopWords
 
+reload(sys)
+sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+sys.stdin = codecs.getreader('utf-8')(sys.stdin)
 
+# pre-compile some res
 # xml/html tags
-tagRE = re.compile(r'<.*?>', re.UNICODE)
+markup_tag_re = re.compile(r'<.*?>', re.UNICODE)
+space_tokenizer_re =  re.compile('\s+', re.UNICODE)
+word_tokenizer_re =  re.compile('\W+', re.UNICODE)
+end_entity_re = re.compile('[\s.,?!\t\n():;#$@&"]', re.UNICODE)
+shortened_url_re = re.compile('http://[a-zA-Z]+.[a-zA-Z]+/[a-zA-Z0-9]+/?', re.UNICODE)
 
 class SimpleNGrams:
     
     def __init__(self, 
-            charCutoff = 2,
-            charUpperCutoff = 25,
+            char_lower_cutoff = 2,
+            char_upper_cutoff = 25,
             cutoff = 0.00001,
-            space_tokenizer=False,
+            tokenizer = None,
+            token_iter = None,
             n_grams = 2):
-        self.char_cutoff = charCutoff
-        self.char_upper_cutoff = charUpperCutoff
+        self.char_lower_cutoff = char_lower_cutoff
+        self.char_upper_cutoff = char_upper_cutoff
         # if cutoff < 1, compare frac else total count
         self.cutoff = cutoff
-        self.space_tokenizer = space_tokenizer
+        # Tokenizer can be either a key word in pre-defined tokenizers or None
+        # When None, tokenizer_reg_ex must be defined
+        if tokenizer is None:
+            if token_iter is not None:
+                self.token_iter = token_iter
+            else:
+                print >>sys.stderr, "Please define valid tokenizer regular expression. Exiting!"
+                sys.exit()
+        else:
+            VALID_TOKENIZERS = ['word','space','twitter']
+            if tokenizer.lower() not in VALID_TOKENIZERS:
+                print >>sys.stderr, "Please select valid tokenizer from {}. Exiting!".format(VALID_TOKENIZERS)
+                sys.exit()
+            else:
+                if tokenizer.lower().startswith("word"):
+                    self.token_iter = self.word_token_iter
+                elif tokenizer.lower().startswith("space"):
+                    self.token_iter = self.space_token_iter
+                elif tokenizer.lower().startswith("twit"):
+                    self.token_iter = self.twitter_token_iter
         self.n_grams = int(n_grams)
-
         self.sl = StopWords()
         self.start_new()
+
+    def word_token_iter(self, row):
+        """Split a row on word boundaries as defined by regex W options"""
+        return [x.lower() for x in word_tokenizer_re.split(row)]
+
+    def space_token_iter(self, row):
+        """Split a row only on whitespace"""
+        return [x.lower() for x in space_tokenizer_re.split(row)]
+
+    def twitter_token_iter(self, row):
+        res = self.get_twitter_entities(row,"#") \
+            + self.get_twitter_entities(row,"@") \
+            + [x.upper() for x in self.get_twitter_entities(row,"$")] \
+            + self.get_shortened_urls(row)
+        #remove id'd tags before tokening remainder
+        return res + [x.lower() for x in word_tokenizer_re.split(markup_tag_re.sub(' ', self.remove(row, res)))]
+
+    def remove(self, row_str, word_list):
+        for x in word_list:
+            row_str = row_str.replace(x, " ")
+        return row_str
+
+    def get_twitter_entities(self, row, marker):
+        """Extract text items that start with special markers such as @ and #"""
+        tags = []
+        in_tag = False
+        for x in row:
+            if x == marker and not in_tag:
+                in_tag = True
+                tag = marker
+            elif in_tag and end_entity_re.findall(x) != []:
+                tags.append(tag)
+                in_tag = False
+            elif in_tag:
+                tag += x
+        return tags
+
+    def get_shortened_urls(self, row):
+        """Extract shortened urls from text"""
+        return shortened_url_re.findall(row)
 
     def start_new(self):
         self.token = {i+1:{"tcnt":0, "gram_dict":{}} for i in range(self.n_grams)}
@@ -39,16 +107,14 @@ class SimpleNGrams:
         if row.strip() == '':
            return 
         self.acnt += 1
-        if self.space_tokenizer:
-            rl = re.compile('\s+', re.UNICODE).split(unicode(row,'utf-8'))
-        else:
-            rl = re.compile('\W+', re.UNICODE).split(tagRE.sub(' ',row))
         act_set = set()
         last_tok_list = []
-        for tok in rl:
-            gram = tok.strip().lower()
+        for tok in self.token_iter(row):
+            # Be sure to deal with lower-ing in tokenizer if necessary!
+            #gram = tok.strip().lower()
+            gram = tok.strip()
             tmp = gram
-            if len(tmp) > self.char_cutoff and len(tmp) < self.char_upper_cutoff and not self.sl[tmp]:
+            if len(tmp) > self.char_lower_cutoff and len(tmp) < self.char_upper_cutoff and not self.sl[tmp]:
                 for i in range(min([self.n_grams, 1 + len(last_tok_list)])):
                     self.token[i+1]["tcnt"] += 1
                     self.token[i+1]["gram_dict"][tmp] = 1 + self.token[i+1]["gram_dict"].get(tmp, 0)
