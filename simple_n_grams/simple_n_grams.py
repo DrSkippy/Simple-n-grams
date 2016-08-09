@@ -6,11 +6,7 @@ import operator
 import re
 import codecs
 
-from stop_words import StopWords
-
-reload(sys)
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-sys.stdin = codecs.getreader('utf-8')(sys.stdin)
+from .stop_words import StopWords
 
 # pre-compile some res
 # xml/html tags
