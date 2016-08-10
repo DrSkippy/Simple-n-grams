@@ -7,9 +7,13 @@ import fileinput
 
 from simple_n_grams.simple_n_grams import SimpleNGrams
 
-reload(sys)
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-sys.stdin = codecs.getreader('utf-8')(sys.stdin)
+if sys.version_info[0] < 3:
+    try:
+        reload(sys)
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+        sys.stdin = codecs.getreader('utf-8')(sys.stdin)
+    except NameError:
+        pass
 
 if __name__ == "__main__":
     grams_parser = argparse.ArgumentParser(
