@@ -8,6 +8,14 @@ import codecs
 
 from .stop_words import StopWords
 
+if int(sys.version_info[0]) < 3:
+    try:
+        reload(sys)
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+        sys.stdin = codecs.getreader('utf-8')(sys.stdin) 
+    except NameError:
+        pass
+
 # pre-compile some res
 # xml/html tags
 markup_tag_re = re.compile(r'<.*?>', re.UNICODE)
@@ -97,7 +105,7 @@ class SimpleNGrams:
         self.token = {i+1:{"tcnt":0, "gram_dict":{}} for i in range(self.n_grams)}
         self.activities = {}
         self.acnt = 0
-        self.max_term_freq = -sys.maxint
+        self.max_term_freq = -sys.maxsize
 
     def add(self, row):
         if row.strip() == '':
