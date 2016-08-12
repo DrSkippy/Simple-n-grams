@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='sngrams',
-    version='0.1.5',
-    author='Scott Hendrickson',
+    version='0.2.0',
+    author='Scott Hendrickson, Jeff Kolb',
     author_email='scott@drskippy.net',
     packages=['simple_n_grams'],
     scripts=['term_frequency.py'],
